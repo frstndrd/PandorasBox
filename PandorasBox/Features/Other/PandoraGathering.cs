@@ -199,10 +199,17 @@ namespace PandorasBox.Features.Other
             public bool UseLuck = false;
 
             public int GPLuck = 200;
+
+            public bool UseBoon = false;
+
+            public int GPBoon = 150;
+
+            public bool UseBoon2 = false;
+
+            public int GPBoon2 = 150;
         }
 
         public Configs Config { get; private set; }
-
 
         public override FeatureType FeatureType => FeatureType.Other;
 
@@ -334,6 +341,16 @@ namespace PandorasBox.Features.Other
                         {
                             SaveConfig(Config);
                         }
+                        ImGui.NextColumn();
+                        if (ImGui.Checkbox($"Use {Svc.Data.GetExcelSheet<Action>(language).GetRow(21178).Name.RawString}", ref Config.UseBoon2))
+                        {
+                            SaveConfig(Config);
+                        }
+                        ImGui.NextColumn();
+                        if (ImGui.Checkbox($"Use {Svc.Data.GetExcelSheet<Action>(language).GetRow(25590).Name.RawString}", ref Config.UseBoon))
+                        {
+                            SaveConfig(Config);
+                        }
                         break;
                     case 16:
                         ImGui.NextColumn();
@@ -359,6 +376,16 @@ namespace PandorasBox.Features.Other
                         }
                         ImGui.NextColumn();
                         if (ImGui.Checkbox($"Use {Svc.Data.GetExcelSheet<Action>(language).GetRow(232).Name.RawString}", ref Config.UseSolidReason))
+                        {
+                            SaveConfig(Config);
+                        }
+                        ImGui.NextColumn();
+                        if (ImGui.Checkbox($"Use {Svc.Data.GetExcelSheet<Action>(language).GetRow(21177).Name.RawString}", ref Config.UseBoon2))
+                        {
+                            SaveConfig(Config);
+                        }
+                        ImGui.NextColumn();
+                        if (ImGui.Checkbox($"Use {Svc.Data.GetExcelSheet<Action>(language).GetRow(25589).Name.RawString}", ref Config.UseBoon))
                         {
                             SaveConfig(Config);
                         }
@@ -563,6 +590,11 @@ namespace PandorasBox.Features.Other
                     SaveConfig(Config);
             }
 
+            if (ImGui.Checkbox($"{Svc.Data.GetExcelSheet<Action>(language).GetRow(21178).Name.RawString} + {Svc.Data.GetExcelSheet<Action>(language).GetRow(25590).Name.RawString} / {Svc.Data.GetExcelSheet<Action>(language).GetRow(21177).Name.RawString} + {Svc.Data.GetExcelSheet<Action>(language).GetRow(25589).Name.RawString}", ref Config.UseBoon))
+            {
+                Config.UseBoon2 = Config.UseBoon;
+                SaveConfig(Config);
+            }
         };
 
         private void CheckLastItem(SetupAddonArgs obj)
@@ -654,6 +686,18 @@ namespace PandorasBox.Features.Other
                         if (Config.GPTwelvesBounty <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseTwelvesBounty)
                         {
                             TaskManager.Enqueue(() => UseTwelvesBounty(), "UseTwelvesSetup");
+                            TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
+                        }
+
+                        if (Config.GPBoon <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon)
+                        {
+                            TaskManager.Enqueue(() => UseBoon(), "UseBoon");
+                            TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
+                        }
+
+                        if (Config.GPBoon2 <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon2)
+                        {
+                            TaskManager.Enqueue(() => UseBoon2(), "UseBoon2");
                             TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
                         }
 
@@ -877,6 +921,56 @@ namespace PandorasBox.Features.Other
                     {
                         ActionManager.Instance()->UseAction(ActionType.Action, 21203);
                         TaskManager.EnqueueImmediate(() => Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 2667));
+                    }
+                    break;
+            }
+
+        }
+
+        private void UseBoon()
+        {
+            // if (Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 759))
+            // return;
+
+            switch (Svc.ClientState.LocalPlayer.ClassJob.Id)
+            {
+                case 17: //btn
+                    if (ActionManager.Instance()->GetActionStatus(ActionType.Action, 25590) == 0)
+                    {
+                        ActionManager.Instance()->UseAction(ActionType.Action, 25590);
+                        TaskManager.EnqueueImmediate(() => Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 759));
+                    }
+                    break;
+                case 16: //min
+                    if (ActionManager.Instance()->GetActionStatus(ActionType.Action, 25589) == 0)
+                    {
+                        ActionManager.Instance()->UseAction(ActionType.Action, 25589);
+                        TaskManager.EnqueueImmediate(() => Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 759));
+                    }
+                    break;
+            }
+
+        }
+
+        private void UseBoon2()
+        {
+            // if (Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 2666))
+            // return;
+
+            switch (Svc.ClientState.LocalPlayer.ClassJob.Id)
+            {
+                case 17: //btn
+                    if (ActionManager.Instance()->GetActionStatus(ActionType.Action, 21178) == 0)
+                    {
+                        ActionManager.Instance()->UseAction(ActionType.Action, 21178);
+                        TaskManager.EnqueueImmediate(() => Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 2666));
+                    }
+                    break;
+                case 16: //min
+                    if (ActionManager.Instance()->GetActionStatus(ActionType.Action, 21177) == 0)
+                    {
+                        ActionManager.Instance()->UseAction(ActionType.Action, 21177);
+                        TaskManager.EnqueueImmediate(() => Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 2666));
                     }
                     break;
             }
