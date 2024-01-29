@@ -702,6 +702,18 @@ namespace PandorasBox.Features.Other
                             TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
                         }
 
+                        if (Config.useGP && Config.GPBoon <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon)
+                        {
+                            TaskManager.Enqueue(() => UseBoon(), "UseBoon");
+                            TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
+                        }
+
+                        if (Config.useGP && Config.GPBoon2 <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon2)
+                        {
+                            TaskManager.Enqueue(() => UseBoon2(), "UseBoon2");
+                            TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
+                        }
+
                         if (Config.GP100Yield <= Svc.ClientState.LocalPlayer.CurrentGp && Config.Use100GPYield)
                         {
                             TaskManager.Enqueue(() => Use100GPSkill(), "Use100GPSetup");
@@ -717,18 +729,6 @@ namespace PandorasBox.Features.Other
                         if (Config.GPTwelvesBounty <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseTwelvesBounty)
                         {
                             TaskManager.Enqueue(() => UseTwelvesBounty(), "UseTwelvesSetup");
-                            TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
-                        }
-
-                        if (Config.useGP && Config.GPBoon <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon)
-                        {
-                            TaskManager.Enqueue(() => UseBoon(), "UseBoon");
-                            TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
-                        }
-
-                        if (Config.useGP && Config.GPBoon2 <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon2)
-                        {
-                            TaskManager.Enqueue(() => UseBoon2(), "UseBoon2");
                             TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
                         }
 
