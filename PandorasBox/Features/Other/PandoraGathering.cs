@@ -682,9 +682,11 @@ namespace PandorasBox.Features.Other
 
                         if (InDiadem)
                         {
-                            Config.useGP = true;
-                            // if (LocationEffect.EndsWith("+5 [On]"))
-                            //     Config.useGP = true;
+                            Config.useGP = false;
+                            if (LocationEffect.Contains("Gathering Attempts/Integrity +5"))
+                            {
+                                Config.useGP = true;
+                            }   
                         }
 
                         if (Config.useGP && Config.GPTidings <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseTidings && (boonChances.TryGetValue((int)lastGatheredIndex, out var val) && val >= Config.GatherersBoon || boonChances.Where(x => x.Value != 0).All(x => x.Value >= Config.GatherersBoon)))
