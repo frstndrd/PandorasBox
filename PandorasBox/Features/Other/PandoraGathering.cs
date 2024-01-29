@@ -202,11 +202,13 @@ namespace PandorasBox.Features.Other
 
             public bool UseBoon = false;
 
-            public int GPBoon = 150;
+            public int GPBoon = 100;
 
             public bool UseBoon2 = false;
 
-            public int GPBoon2 = 150;
+            public int GPBoon2 = 50;
+
+            public bool useGP = true;
         }
 
         public Configs Config { get; private set; }
@@ -590,11 +592,30 @@ namespace PandorasBox.Features.Other
                     SaveConfig(Config);
             }
 
-            if (ImGui.Checkbox($"{Svc.Data.GetExcelSheet<Action>(language).GetRow(21178).Name.RawString} + {Svc.Data.GetExcelSheet<Action>(language).GetRow(25590).Name.RawString} / {Svc.Data.GetExcelSheet<Action>(language).GetRow(21177).Name.RawString} + {Svc.Data.GetExcelSheet<Action>(language).GetRow(25589).Name.RawString}", ref Config.UseBoon))
+            if (ImGui.Checkbox($"Use {Svc.Data.GetExcelSheet<Action>(language).GetRow(21178).Name.RawString} / {Svc.Data.GetExcelSheet<Action>(language).GetRow(21177).Name.RawString}", ref Config.UseBoon2))
             {
-                Config.UseBoon2 = Config.UseBoon;
                 SaveConfig(Config);
             }
+
+            if (Config.UseBoon2)
+            {
+                ImGui.PushItemWidth(300);
+                if (ImGui.SliderInt("Min. GP###MinGP8", ref Config.GPBoon2, 50, 1000))
+                    SaveConfig(Config);
+            }
+
+            if (ImGui.Checkbox($" Use {Svc.Data.GetExcelSheet<Action>(language).GetRow(25590).Name.RawString} / {Svc.Data.GetExcelSheet<Action>(language).GetRow(25589).Name.RawString}", ref Config.UseBoon))
+            {
+                SaveConfig(Config);
+            }
+
+            if (Config.UseBoon)
+            {
+                ImGui.PushItemWidth(300);
+                if (ImGui.SliderInt("Min. GP###MinGP9", ref Config.GPBoon, 100, 1000))
+                    SaveConfig(Config);
+            }
+
         };
 
         private void CheckLastItem(SetupAddonArgs obj)
@@ -659,13 +680,20 @@ namespace PandorasBox.Features.Other
 
                         HiddenRevealed = false;
 
-                        if (Config.GPTidings <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseTidings && (boonChances.TryGetValue((int)lastGatheredIndex, out var val) && val >= Config.GatherersBoon || boonChances.Where(x => x.Value != 0).All(x => x.Value >= Config.GatherersBoon)))
+                        if (InDiadem)
+                        {
+                            Config.useGP = true;
+                            // if (LocationEffect.EndsWith("+5 [On]"))
+                            //     Config.useGP = true;
+                        }
+
+                        if (Config.useGP && Config.GPTidings <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseTidings && (boonChances.TryGetValue((int)lastGatheredIndex, out var val) && val >= Config.GatherersBoon || boonChances.Where(x => x.Value != 0).All(x => x.Value >= Config.GatherersBoon)))
                         {
                             TaskManager.Enqueue(() => UseTidings(), "UseTidings");
                             TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
                         }
 
-                        if (Config.GP500Yield <= Svc.ClientState.LocalPlayer.CurrentGp && Config.Use500GPYield)
+                        if (Config.useGP && Config.GP500Yield <= Svc.ClientState.LocalPlayer.CurrentGp && Config.Use500GPYield)
                         {
                             TaskManager.Enqueue(() => Use500GPSkill(), "Use500GPSetup");
                             TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
@@ -689,13 +717,13 @@ namespace PandorasBox.Features.Other
                             TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
                         }
 
-                        if (Config.GPBoon <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon)
+                        if (Config.useGP && Config.GPBoon <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon)
                         {
                             TaskManager.Enqueue(() => UseBoon(), "UseBoon");
                             TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
                         }
 
-                        if (Config.GPBoon2 <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon2)
+                        if (Config.useGP && Config.GPBoon2 <= Svc.ClientState.LocalPlayer.CurrentGp && Config.UseBoon2)
                         {
                             TaskManager.Enqueue(() => UseBoon2(), "UseBoon2");
                             TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Gathering42]);
@@ -927,7 +955,7 @@ namespace PandorasBox.Features.Other
 
         }
 
-        private void UseBoon()
+        private void UseBoon() // boon +30%
         {
             // if (Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 759))
             // return;
@@ -952,7 +980,7 @@ namespace PandorasBox.Features.Other
 
         }
 
-        private void UseBoon2()
+        private void UseBoon2() // boon +10%
         {
             // if (Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 2666))
             // return;
